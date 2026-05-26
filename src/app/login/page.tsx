@@ -10,9 +10,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { authClient } from "@/lib/auth/client";
 import { LoginDto, loginSchema } from "@/lib/validators/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 export default function Page() {
@@ -22,9 +24,19 @@ export default function Page() {
     formState: { errors },
   } = useForm<LoginDto>({ resolver: zodResolver(loginSchema) });
 
-  function onSubmit(data: LoginDto) {
-    console.log(data);
+  // Login
+  async function onSubmit(data: LoginDto) {
+    const { error } = await authClient.signIn.email({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
+      return { error: error.message || "Failed to create account" };
+    }
+    redirect("/");
   }
+
   return (
     <div className="h-screen flex justify-center items-center">
       <Card className="w-full max-w-sm">

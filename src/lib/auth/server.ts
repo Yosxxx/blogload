@@ -1,4 +1,4 @@
-import { createNeonAuth } from '@neondatabase/auth/next/server';
+import { createNeonAuth } from "@neondatabase/auth/next/server";
 
 export const auth = createNeonAuth({
   baseUrl: process.env.NEON_AUTH_BASE_URL!,
@@ -9,3 +9,14 @@ export const auth = createNeonAuth({
   // logLevel: 'silent', // disable Neon Auth logging
   // logLevel: 'debug',  // verbose proxy/upstream logging
 });
+
+// Server helper for getting session
+export async function getCurrentUser() {
+  const { data: session, error } = await auth.getSession();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return session?.user ?? null;
+}

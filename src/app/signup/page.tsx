@@ -11,30 +11,44 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth/client";
-import { RegisterDto, registerSchema } from "@/lib/validators/auth";
+import { registerSchema, signUpRequestNeonAuth } from "@/lib/validators/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { signUpUser } from "@/app/actions/auth.action";
 
 export default function Page() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterDto>({ resolver: zodResolver(registerSchema) });
+  } = useForm<signUpRequestNeonAuth>({ resolver: zodResolver(registerSchema) });
 
   // Register
-  async function onSubmit(data: RegisterDto) {
-    const { error } = await authClient.signUp.email({
-      email: data.email,
-      name: data.name,
-      password: data.password,
+  async function onSubmit(input: signUpRequestNeonAuth) {
+
+    // Signup NeonAuth
+    const { data, error } = await authClient.signUp.email({
+      email: input.email,
+      name: input.name,
+      password: input.password,
     });
 
-    if (error) {
-      return { error: error.message || "Failed to create account" };
-    }
+    // Failed to create account NeonAuth
+    if (error) return { error: error.message ?? "Failed to create account" };
+
+    // Signup profile
+    const dbResult = await signUpUser({
+      id: data.user.id,
+      email: data.user.email,
+      name: input.name,
+    });
+
+
+    // Failed to signup profile
+    if (dbResult?.error) return console.error(dbResult.error);
+
     redirect("/");
   }
 

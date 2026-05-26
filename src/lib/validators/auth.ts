@@ -17,5 +17,5 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-export type RegisterDto = z.infer<typeof registerSchema>;
-export type LoginDto = z.infer<typeof loginSchema>;
+export type signUpRequestNeonAuth = z.infer<typeof registerSchema>;
+export type loginRequestNeonAuth = z.infer<typeof loginSchema>;

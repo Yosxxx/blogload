@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth/client";
-import { LoginDto, loginSchema } from "@/lib/validators/auth";
+import { loginRequestNeonAuth, loginSchema } from "@/lib/validators/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -22,18 +22,18 @@ export default function Page() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginDto>({ resolver: zodResolver(loginSchema) });
+  } = useForm<loginRequestNeonAuth>({ resolver: zodResolver(loginSchema) });
 
-  // Login
-  async function onSubmit(data: LoginDto) {
+  async function loginUser(input: loginRequestNeonAuth) {
     const { error } = await authClient.signIn.email({
-      email: data.email,
-      password: data.password,
+      email: input.email,
+      password: input.password,
     });
 
     if (error) {
       return { error: error.message || "Failed to create account" };
     }
+    
     redirect("/");
   }
 
@@ -45,7 +45,7 @@ export default function Page() {
           <CardDescription>Enter credentials</CardDescription>
         </CardHeader>
         <CardContent>
-          <form id="login-form" onSubmit={handleSubmit(onSubmit)}>
+          <form id="login-form" onSubmit={handleSubmit(loginUser)}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

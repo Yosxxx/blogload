@@ -15,7 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { createPostRequest } from "@/types/post";
 import { createPost } from "@/app/actions/post.action";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 export default function Page() {
   const {
@@ -24,6 +25,8 @@ export default function Page() {
     reset,
     formState: { errors },
   } = useForm<createPostRequest>({ resolver: zodResolver(createPostSchema) });
+
+  const router = useRouter();
 
   function resetPost() {
     reset({
@@ -44,7 +47,14 @@ export default function Page() {
   }
 
   return (
-    <div className="h-screen justify-center items-center flex">
+    <div className="h-screen justify-center items-center flex flex-col">
+      <div className="w-full max-w-2xl">
+
+      <Button className="mb-2 hover:cursor-pointer" variant={"link"} onClick={() => router.back()}>
+        <ArrowLeft />
+        Back
+      </Button>
+
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle>Create a post</CardTitle>
@@ -89,6 +99,7 @@ export default function Page() {
           </Button>
         </CardFooter>
       </Card>
+      </div>
     </div>
   );
 }
